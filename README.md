@@ -3,8 +3,9 @@ Requirement:
 2. Once user sign up/in, redirect to the home screen
 3. play one vedio, the vedio should get from database and ask one quiz question
 4. in the background timer should from from 1 sec - nano sec.
-5. Once user submits the quiz. store the user details along with timer in db. Show pop up to the user with thank you note and all the submitted yser details with timer.
-6. 
+5. we need to store only the first 10 users data in db, but display in asc order based on the timer.
+6. Once user submits the quiz. Store the user details along with timer in db. Show one alert to the user with thank you note and all the submitted user details with timer.
+  
 
 
 Changes:
