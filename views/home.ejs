@@ -1,0 +1,106 @@
+<!-- Requirment: we should get vedio from db, and play when user lands on home pame
+    but here we are not fetching it from db. Stored one vedio in repo, playing that.
+
+    Reason: 
+    we can store the vedio in many ways
+    1. storing in vedio in blog format(Not recommened)
+    2. storing in local, saving the location in db
+    3. storing in s3 bucket, storing the s3 bucket vedio url in db.(for this we need aws acc)
+
+-->
+<video width="640" height="360" controls>
+    <source src="./vediocheck.mp4" type="video/mp4" />
+    Your browser does not support the video tag.?
+  </video>
+  <h1>Quiz</h1>
+  <form id="mcqForm" action="/submitQuiz" method="post">
+    <p>Select one option in below</p>
+    <label>
+      <input type="radio" name="mcq" id="mcq" value="option1" /> Option 1 </label
+    ><br />
+    <label>
+      <input type="radio" name="mcq" id="mcq" value="option2" /> Option 2 </label
+    ><br />
+    <label>
+      <input type="radio" name="mcq" id="mcq" value="option3" /> Option 3 </label
+    ><br />
+    <input type="hidden" name="email" id="emailid" value="<%= emailid %>" />
+    <input type="hidden" name="username" id="username" value="<%= username %>" />
+    <input type="hidden" name="timer" id="timerInput" value="seconds" />
+  
+    <button type="submit">Submit</button>
+  </form>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const timerInput = document.getElementById("timerInput");
+      let seconds = 0;
+  
+      //   This function will be called every one second.
+      // it will update the timer
+      function updateTimer() {
+        console.log("updateTimer sec", seconds);
+        if (seconds >= 60) {
+          // Time is up, handle as needed
+          clearInterval(timerInterval);
+        } else {
+          timerInput.value = ++seconds;
+        }
+      }
+  
+      const timerInterval = setInterval(updateTimer, 1000);
+  
+      // Add event listener for form submission
+      const quizForm = document.querySelector("#mcqForm");
+  
+      //   Once user submits the quiz
+      quizForm.addEventListener("submit", async (event) => {
+        // stoping the timer
+        clearInterval(timerInterval);
+        event.preventDefault();
+  
+        const formData = new FormData(quizForm);
+        const urlEncoded = new URLSearchParams(formData).toString();
+  
+        // passing form data to the submitQuiz post router
+        const response = await fetch("submitQuiz", {
+          method: "POST",
+          body: urlEncoded,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        });
+  
+        const responseData = await response.json();
+        console.log(
+          "responseData",
+          responseData,
+          responseData.message,
+          responseData.message.length
+        );
+        // if succes is true, means user data added in db.
+        // we need to display all the submitted user results in alert.
+        if (responseData.success) {
+          var alertMsg = "Thank you for the response\n";
+          // running one loop to make alert message to display
+          for (let i = 0; i < responseData.message.length; i++) {
+            alertMsg +=
+              "user name: " +
+              responseData.message[i].username +
+              ", time " +
+              responseData.message[i].time +
+              "\n";
+          }
+  
+          // Display a "thank you" alert and redirect to the home screen
+          alert(alertMsg);
+  
+        } else {
+          // if user data not stored in db because of any reason, we are displayign the reason in alert.
+          alert(responseData.message);
+  
+        }
+        window.location.href = '/home';
+      });
+    });
+  </script>
+  
